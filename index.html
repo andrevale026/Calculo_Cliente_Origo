@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Simulador Calculadora de Energia | Sistema 4K Futurista</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Fontes Futuristas Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg-absolute: #000000;
+    --bg-gradient: radial-gradient(circle at top center, #0f051d 0%, #000000 100%);
+    --card-bg: rgba(15, 15, 26, 0.9);
+    --border-glass: rgba(0, 243, 255, 0.15);
+    
+    --neon-cyan: #00f3ff;
+    --neon-green: #00ff9d;
+    --neon-red: #ff0055;
+    --neon-orange: #ff9900;
+    --neon-purple: #bc13fe;
+    
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-absolute);
+    background-image: var(--bg-gradient);
+    background-attachment: fixed;
+    color: var(--text-main);
+    padding: 15px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+header h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.2rem);
+    letter-spacing: 2px;
+    margin: 0 0 5px 0;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+header h1 span {
+    color: var(--neon-cyan);
+}
+
+header p {
+    font-family: 'Rajdhani', sans-serif;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.main-wrapper {
+    width: 100%;
+    max-width: 1350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+
+.simulador-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+    transition: all 0.5s ease;
+}
+
+@media (min-width: 1024px) {
+    .simulador-container.colunas-1 {
+        grid-template-columns: minmax(380px, 460px);
+    }
+    .simulador-container.colunas-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.coluna-bloco {
+    background: var(--card-bg);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.coluna-titulo {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 5px;
+    color: var(--neon-purple);
+}
+
+.tabela-dados {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.tabela-dados th, .tabela-dados td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    vertical-align: middle;
+}
+
+.tabela-dados td:first-child {
+    color: var(--text-main);
+    font-weight: 400;
+}
+
+.tabela-dados td:last-child {
+    text-align: right;
+    font-weight: 600;
+}
+
+input.input-user, select.input-user {
+    width: 72%;
+    max-width: 160px;
+    margin-left: auto;
+    display: block;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    color: var(--neon-cyan);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: right;
+    font-family: 'Inter', sans-serif;
+}
+
+select.input-user {
+    text-align: left;
+    color: #ffffff;
+    width: 100%;
+    max-width: 100%;
+}
+
+select.input-user option {
+    background: #0a0a14;
+    color: #ffffff;
+}
+
+input.input-user:focus, select.input-user:focus {
+    outline: none;
+    border-color: var(--neon-green);
+    background: rgba(0, 0, 0, 0.9);
+    color: var(--neon-green);
+}
+
+.linha-destaque-amarelo { background-color: rgba(255, 153, 0, 0.08); border-left: 3px solid var(--neon-orange); }
+.linha-destaque-roxo { background-color: rgba(188, 19, 254, 0.08); border-left: 3px solid var(--neon-purple); }
+.linha-destaque-verde { background-color: rgba(0, 255, 157, 0.08); border-left: 3px solid var(--neon-green); }
+.linha-destaque-azul { background-color: rgba(0, 243, 255, 0.08); border-left: 3px solid var(--neon-cyan); }
+.linha-calc-sistema { background-color: rgba(255, 255, 255, 0.02); color: var(--text-muted); }
+
+.btn-calcular, .btn-imprimir {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.btn-calcular {
+    margin-top: 10px;
+    background: rgba(0, 243, 255, 0.1);
+    color: var(--neon-cyan);
+    border: 1px solid var(--neon-cyan);
+}
+
+.btn-calcular:hover {
+    background: var(--neon-cyan);
+    color: #000000;
+}
+
+.btn-imprimir {
+    margin-top: 10px;
+    background: rgba(0, 255, 157, 0.1);
+    color: var(--neon-green);
+    border: 1px solid var(--neon-green);
+}
+
+.btn-imprimir:hover {
+    background: var(--neon-green);
+    color: #000000;
+}
+
+.alerta-diferenca {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 700;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+}
+
+.alerta-cobrar { background: rgba(255, 0, 85, 0.12); border: 1px solid var(--neon-red); color: #ff80ab; }
+.alerta-devolver { background: rgba(0, 255, 157, 0.12); border: 1px solid var(--neon-green); color: var(--neon-green); }
+
+.texto-valor {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.05rem;
+}
+
+.hidden-col { display: none !important; }
+
+/* Rodapé */
+footer {
+    margin-top: 30px;
+    text-align: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--neon-red);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+}
+
+/* Adaptação para celulares (Responsividade Mobile) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px 5px;
+    }
+    header h1 {
+        font-size: 1.3rem;
+    }
+    header p {
+        font-size: 0.8rem;
+    }
+    .coluna-bloco {
+        padding: 12px;
+        gap: 10px;
+    }
+    .tabela-dados {
+        font-size: 0.78rem;
+    }
+    input.input-user {
+        width: 100%;
+        max-width: 100%;
+        font-size: 0.85rem;
+        padding: 5px 8px;
+    }
+    .simulador-container.colunas-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Força a impressão a manter as cores e fundos originais */
+@media print {
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        background-color: #000000 !important;
+        background-image: radial-gradient(circle at top center, #0f051d 0%, #000000 100%) !important;
+        color: #f8fafc !important;
+        padding: 5px;
+    }
+    .coluna-bloco {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        background: rgba(15, 15, 26, 0.95) !important;
+        border-color: rgba(0, 243, 255, 0.3) !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+    }
+    .btn-calcular, .btn-imprimir {
+        display: none !important;
+    }
+    input.input-user, select.input-user {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        background: rgba(0, 0, 0, 0.8) !important;
+        border-color: rgba(0, 243, 255, 0.5) !important;
+        color: var(--neon-cyan) !important;
+    }
+    select.input-user {
+        color: #ffffff !important;
+    }
+    footer {
+        color: var(--neon-red) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Simulador <span>Calculadora de Energia</span></h1>
+    <p>Sistema Computacional de Eficiência e Compensação 4K</p>
+</header>
+
+<div class="main-wrapper">
+    <div id="simuladorContainer" class="simulador-container colunas-1">
+
+        <!-- COLUNA 1: DADOS DA FATURA -->
+        <div class="coluna-bloco">
+            <div class="coluna-titulo">Dados da Fatura</div>
+            <table class="tabela-dados">
+                <tr>
+                    <td>Consumo total kWh</td>
+                    <td><input type="text" id="consumo_total" class="input-user field-nav" value="" inputmode="numeric"></td>
+                </tr>
+                <tr>
+                    <td>Taxa disponibilidade</td>
+                    <td>
+                        <select id="taxa_disponibilidade" class="input-user field-nav">
+                            <option value="0">Selecione...</option>
+                            <option value="30">Monofásico - 30 kWh</option>
+                            <option value="50">Bifásico - 50 kWh</option>
+                            <option value="100">Trifásico - 100 kWh</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Tarifa Cheia/seca</td>
+                    <td><input type="text" id="tarifa_cheia" class="input-user field-nav" value="" inputmode="numeric"></td>
+                </tr>
+                <tr class="linha-calc-sistema">
+                    <td>Tarifa c/ acréscimo bandeira (Calc.)</td>
+                    <td id="res_tarifa_com_bandeira" style="color: var(--neon-orange);">0,000000</td>
+                </tr>
+                <tr>
+                    <td>Energia Ativa Injetada GD II</td>
+                    <td><input type="text" id="tarifa_compensacao" class="input-user field-nav" value="0,986600" inputmode="numeric"></td>
+                </tr>
+                <tr class="linha-calc-sistema">
+                    <td>Tarifa de devolução Imposto (Calc.)</td>
+                    <td id="res_tarifa_dev_imposto" style="color: var(--neon-cyan);">0,000000</td>
+                </tr>
+                <tr>
+                    <td>Acréscimo Bandeira Amarela</td>
+                    <td><input type="text" id="bandeira_amarela_val" class="input-user field-nav" value="" inputmode="numeric"></td>
+                </tr>
+                <tr>
+                    <td>Acréscimo Bandeira Vermelha</td>
+                    <td><input type="text" id="bandeira_vermelha_val" class="input-user field-nav" value="" inputmode="numeric"></td>
+                </tr>
+                <tr>
+                    <td>Disponibilidade</td>
+                    <td id="res_disp_qtd" style="color: var(--text-muted);">0</td>
+                </tr>
+                <tr class="linha-calc-sistema">
+                    <td>Tarifa acréscimo bandeira (Calc.)</td>
+                    <td id="res_tarifa_acrescimo_bandeira">0,0000</td>
+                </tr>
+                <tr>
+                    <td>Desconto Plano %</td>
+                    <td><input type="text" id="desc_plano_pct" class="input-user field-nav" value="" inputmode="numeric"></td>
+                </tr>
+                <tr>
+                    <td>Desconto adicional %</td>
+                    <td><input type="text" id="desc_adicional_pct" class="input-user field-nav" value="" inputmode="numeric"></td>
+                </tr>
+                <tr>
+                    <td>kWh Compensado (Editável)</td>
+                    <td><input type="text" id="res_kwh_compensado_calc" class="input-user field-nav" value="" inputmode="numeric" style="color: var(--neon-green);"></td>
+                </tr>
+            </table>
+            
+            <button class="btn-calcular" id="btnCalcular">Executar Cálculo</button>
+        </div>
+
+        <!-- COLUNA 2: CALCULO APLICAÇÃO DESCONTOS E DEVOLUÇÕES -->
+        <div id="coluna2" class="coluna-bloco hidden-col">
+            <div class="coluna-titulo">Aplicações & Devoluções</div>
+            <table class="tabela-dados">
+                <tr>
+                    <td>kWh compensado</td>
+                    <td id="c2_kwh_comp">0</td>
+                </tr>
+                <tr>
+                    <td>Tarifa cheia c/ acréscimo</td>
+                    <td id="c2_tarifa_cheia_acresc">0,000000</td>
+                </tr>
+                <tr>
+                    <td>Tarifa compensação</td>
+                    <td id="c2_tarifa_comp">0,986600</td>
+                </tr>
+                <tr>
+                    <td>Tarifa devolução de imposto</td>
+                    <td id="c2_tarifa_dev">0,000000</td>
+                </tr>
+                <tr class="linha-destaque-amarelo">
+                    <td><strong>Boleto Cheio</strong></td>
+                    <td id="c2_boleto_cheio" class="texto-valor" style="color: var(--neon-orange);">R$ 0,00</td>
+                </tr>
+                <tr>
+                    <td>Desconto Plano %</td>
+                    <td id="c2_desc_plano" class="texto-valor">R$ 0,00</td>
+                </tr>
+                <tr>
+                    <td>Desconto Adicional %</td>
+                    <td id="c2_desc_adicional" class="texto-valor">R$ 0,00</td>
+                </tr>
+                <tr class="linha-destaque-amarelo">
+                    <td><strong>Total Desconto</strong></td>
+                    <td id="c2_total_desconto" class="texto-valor" style="color: var(--neon-orange);">R$ 0,00</td>
+                </tr>
+                <tr class="linha-destaque-verde">
+                    <td><strong>Devolução de Impostos</strong></td>
+                    <td id="c2_dev_impostos" class="texto-valor" style="color: var(--neon-green);">R$ 0,00</td>
+                </tr>
+                <tr class="linha-destaque-amarelo">
+                    <td><strong>Boleto liq. Com Desconto</strong></td>
+                    <td id="c2_boleto_liq" class="texto-valor" style="color: var(--neon-orange);">R$ 0,00</td>
+                </tr>
+                <tr class="linha-destaque-roxo">
+                    <td><strong>Boleto Órigo Sistema</strong></td>
+                    <td><input type="text" id="c2_boleto_origo_input" class="input-user auto-recalc field-nav-c2" value="" inputmode="numeric"></td>
+                </tr>
+            </table>
+
+            <div style="margin-top: auto;">
+                <table class="tabela-dados">
+                    <tr class="linha-destaque-amarelo">
+                        <td><strong>Diferença</strong></td>
+                        <td id="c2_diferenca" class="texto-valor">R$ 0,00</td>
+                    </tr>
+                </table>
+                <div id="alertaDiferenca" class="alerta-diferenca" style="background: rgba(255,255,255,0.02); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1);">Aguardando dados...</div>
+            </div>
+        </div>
+
+        <!-- COLUNA 3: CALCULO TARIFÁRIO (TARIFA FINAL ÓRIGO) -->
+        <div id="coluna3" class="coluna-bloco hidden-col">
+            <div class="coluna-titulo">Tarifa Final Órigo</div>
+            <table class="tabela-dados">
+                <tr class="linha-calc-sistema">
+                    <td>Consumo total kWh</td>
+                    <td id="c3_consumo_total">0</td>
+                </tr>
+                <tr class="linha-destaque-azul">
+                    <td><strong>KWh Distribuidora</strong></td>
+                    <td id="c3_tarifa_distribuidora" class="texto-valor" style="color: var(--neon-cyan);">0,000000</td>
+                </tr>
+                <tr class="linha-destaque-amarelo">
+                    <td><strong>Total Consumo</strong></td>
+                    <td id="c3_total_consumo" class="texto-valor" style="color: var(--neon-orange);">R$ 0,00</td>
+                </tr>
+                <tr>
+                    <td>Bandeiras (Amarela + Vermelha)</td>
+                    <td id="c3_bandeira_amarela" class="texto-valor">R$ 0,00</td>
+                </tr>
+                <tr>
+                    <td>Iluminação Pública</td>
+                    <td><input type="text" id="c3_iluminacao" class="input-user auto-recalc field-nav-c3" value="" inputmode="numeric"></td>
+                </tr>
+                <tr>
+                    <td>Juros e outros</td>
+                    <td><input type="text" id="c3_juros" class="input-user auto-recalc field-nav-c3" value="" inputmode="numeric"></td>
+                </tr>
+                <tr>
+                    <td>Parcelamento</td>
+                    <td><input type="text" id="c3_parcelamento" class="input-user auto-recalc field-nav-c3" value="" inputmode="numeric"></td>
+                </tr>
+                <tr class="linha-destaque-amarelo" style="margin-top: 5px;">
+                    <td><strong>TOTAL DISTRIBUIDORA</strong></td>
+                    <td id="c3_total_distribuidora" class="texto-valor" style="color: var(--neon-orange);">R$ 0,00</td>
+                </tr>
+            </table>
+
+            <table class="tabela-dados" style="margin-top: 10px;">
+                <tr class="linha-destaque-azul">
+                    <td><strong>DISTRIBUIDORA</strong></td>
+                    <td><input type="text" id="c3_distribuidora_input" class="input-user auto-recalc field-nav-c3" value="" inputmode="numeric"></td>
+                </tr>
+                <tr class="linha-destaque-roxo">
+                    <td><strong>ORIGO</strong></td>
+                    <td id="c3_fatura_origo" class="texto-valor" style="color: var(--neon-purple);">R$ 0,00</td>
+                </tr>
+                <tr class="linha-destaque-verde">
+                    <td><strong>TOTAL GERAL</strong></td>
+                    <td id="res_total_geral" class="texto-valor" style="color: var(--neon-green);">R$ 0,00</td>
+                </tr>
+            </table>
+
+            <table class="tabela-dados" style="margin-top: 10px;">
+                <tr class="linha-destaque-verde">
+                    <td><strong>ECONOMIA MES</strong></td>
+                    <td id="res_economia_mes" class="texto-valor" style="color: var(--neon-green); font-size: 1.15rem;">R$ 0,00</td>
+                </tr>
+            </table>
+
+            <!-- Botão Imprimir Nativo -->
+            <button id="btnImprimir" class="btn-imprimir">Imprimir Tela</button>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    DESIGN BY ANDRÉ LEONARDO VALE - 08/26
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const fmtBRL = (val) => "R$ " + val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtNum = (val, dec = 6) => val.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+
+    function aplicarMascara(input, decimais) {
+        let valorLimpo = input.value.replace(/\D/g, "");
+        if (!valorLimpo) {
+            input.value = "";
+            return;
+        }
+        let numero = parseInt(valorLimpo, 10) / Math.pow(10, decimais);
+        input.value = numero.toLocaleString('pt-BR', { minimumFractionDigits: decimais, maximumFractionDigits: decimais });
+    }
+
+    function parseValor(id) {
+        let el = document.getElementById(id);
+        if (!el || !el.value.trim()) return 0;
+        let valStr = el.value.replace(/\./g, "").replace(",", ".");
+        return parseFloat(valStr) || 0;
+    }
+
+    document.getElementById('tarifa_cheia').addEventListener('input', (e) => aplicarMascara(e.target, 6));
+    document.getElementById('tarifa_compensacao').addEventListener('input', (e) => aplicarMascara(e.target, 6));
+    
+    document.getElementById('bandeira_amarela_val').addEventListener('input', (e) => aplicarMascara(e.target, 2));
+    document.getElementById('bandeira_vermelha_val').addEventListener('input', (e) => aplicarMascara(e.target, 2));
+    
+    document.getElementById('c2_boleto_origo_input').addEventListener('input', (e) => {
+        aplicarMascara(e.target, 2);
+        calcularTudo(false);
+    });
+    
+    document.getElementById('c3_iluminacao').addEventListener('input', (e) => { aplicarMascara(e.target, 2); calcularTudo(false); });
+    document.getElementById('c3_juros').addEventListener('input', (e) => { aplicarMascara(e.target, 2); calcularTudo(false); });
+    document.getElementById('c3_parcelamento').addEventListener('input', (e) => { aplicarMascara(e.target, 2); calcularTudo(false); });
+    document.getElementById('c3_distribuidora_input').addEventListener('input', (e) => { aplicarMascara(e.target, 2); calcularTudo(false); });
+
+    // Atualiza o valor padrão do kWh Compensado sempre que o consumo total ou a taxa de disponibilidade mudarem
+    function atualizarKwhCompensadoPadrao() {
+        const consumoTotal = parseFloat(document.getElementById('consumo_total').value.replace(/\./g, "").replace(",", ".")) || 0;
+        const taxaDisp = parseFloat(document.getElementById('taxa_disponibilidade').value) || 0;
+        const kwhCompInputEl = document.getElementById('res_kwh_compensado_calc');
+        
+        const kwhCompensadoCalc = Math.max(0, consumoTotal - taxaDisp);
+        kwhCompInputEl.value = kwhCompensadoCalc;
+    }
+
+    document.getElementById('consumo_total').addEventListener('input', atualizarKwhCompensadoPadrao);
+    document.getElementById('taxa_disponibilidade').addEventListener('change', atualizarKwhCompensadoPadrao);
+
+    // Navegação por ENTER na Coluna 1
+    const camposC1 = document.querySelectorAll('.field-nav');
+    camposC1.forEach((campo, index) => {
+        campo.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const proximo = camposC1[index + 1];
+                if (proximo) {
+                    proximo.focus();
+                    if (proximo.select) proximo.select();
+                } else {
+                    executarCalculoPrincipal();
+                }
+            }
+        });
+    });
+
+    // Enter na Coluna 2 (Boleto Órigo Sistema) pula para a Iluminação na Coluna 3
+    document.getElementById('c2_boleto_origo_input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('c3_iluminacao').focus();
+            document.getElementById('c3_iluminacao').select();
+        }
+    });
+
+    // Navegação por ENTER na Coluna 3
+    const camposC3 = document.querySelectorAll('.field-nav-c3');
+    camposC3.forEach((campo, index) => {
+        campo.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const proximo = camposC3[index + 1];
+                if (proximo) {
+                    proximo.focus();
+                    if (proximo.select) proximo.select();
+                } else {
+                    campo.blur();
+                }
+            }
+        });
+    });
+
+    function calcularTudo(revelarColunas = true) {
+        const consumoTotal = parseFloat(document.getElementById('consumo_total').value.replace(/\./g, "").replace(",", ".")) || 0;
+        const taxaDisp = parseFloat(document.getElementById('taxa_disponibilidade').value) || 0;
+        const tarifaCheia = parseValor('tarifa_cheia');
+        const energInejGD2 = parseValor('tarifa_compensacao');
+        const bandeiraAmarela = parseValor('bandeira_amarela_val');
+        const bandeiraVermelha = parseValor('bandeira_vermelha_val');
+        const descPlanoPct = parseFloat(document.getElementById('desc_plano_pct').value.replace(",", ".")) || 0;
+        const descAdicionalPct = parseFloat(document.getElementById('desc_adicional_pct').value.replace(",", ".")) || 0;
+
+        let tarifaAcrescimoBandeira = 0;
+        if (consumoTotal > 0) {
+            tarifaAcrescimoBandeira = (bandeiraAmarela + bandeiraVermelha) / consumoTotal;
+        }
+
+        const tarifaComBandeira = tarifaCheia + tarifaAcrescimoBandeira;
+        const tarifaDevImposto = Math.max(0, tarifaCheia - energInejGD2);
+        
+        const kwhCompInputEl = document.getElementById('res_kwh_compensado_calc');
+        if (!kwhCompInputEl.value) {
+            kwhCompInputEl.value = Math.max(0, consumoTotal - taxaDisp);
+        }
+
+        const kwhComp = parseFloat(kwhCompInputEl.value.replace(/\./g, "").replace(",", ".")) || 0;
+
+        document.getElementById('res_tarifa_com_bandeira').innerText = fmtNum(tarifaComBandeira);
+        document.getElementById('res_tarifa_dev_imposto').innerText = fmtNum(tarifaDevImposto);
+        document.getElementById('res_tarifa_acrescimo_bandeira').innerText = fmtNum(tarifaAcrescimoBandeira, 4);
+        document.getElementById('res_disp_qtd').innerText = taxaDisp;
+
+        document.getElementById('c2_kwh_comp').innerText = kwhComp;
+        document.getElementById('c2_tarifa_cheia_acresc').innerText = fmtNum(tarifaComBandeira);
+        document.getElementById('c2_tarifa_comp').innerText = fmtNum(energInejGD2, 6);
+        document.getElementById('c2_tarifa_dev').innerText = fmtNum(tarifaDevImposto);
+
+        const boletoCheio = kwhComp * tarifaComBandeira;
+        const descPlano = boletoCheio * (descPlanoPct / 100);
+        const descAdicional = boletoCheio * (descAdicionalPct / 100); 
+        const totalDesconto = descPlano + descAdicional;
+        
+        const devImpostos = kwhComp * tarifaDevImposto;
+        const boletoLiq = boletoCheio - totalDesconto - devImpostos;
+        
+        const boletoOrigoSistema = parseValor('c2_boleto_origo_input');
+
+        document.getElementById('c2_boleto_cheio').innerText = fmtBRL(boletoCheio);
+        document.getElementById('c2_desc_plano').innerText = fmtBRL(descPlano);
+        document.getElementById('c2_desc_adicional').innerText = fmtBRL(descAdicional);
+        document.getElementById('c2_total_desconto').innerText = fmtBRL(totalDesconto);
+        document.getElementById('c2_dev_impostos').innerText = fmtBRL(devImpostos);
+        document.getElementById('c2_boleto_liq').innerText = fmtBRL(boletoLiq);
+
+        const diferenca = boletoLiq - boletoOrigoSistema;
+        document.getElementById('c2_diferenca').innerText = fmtBRL(Math.abs(diferenca));
+
+        const alertaEl = document.getElementById('alertaDiferenca');
+        if (diferenca > 0) {
+            alertaEl.innerText = "Cobrar do cliente.";
+            alertaEl.className = "alerta-diferenca alerta-cobrar";
+            document.getElementById('c2_diferenca').style.color = "var(--neon-red)";
+        } else if (diferenca < 0) {
+            alertaEl.innerText = "Devolver ao cliente.";
+            alertaEl.className = "alerta-diferenca alerta-devolver";
+            document.getElementById('c2_diferenca').style.color = "var(--neon-green)";
+        } else {
+            alertaEl.innerText = "Sem diferença pendente.";
+            alertaEl.className = "alerta-diferenca";
+            document.getElementById('c2_diferenca').style.color = "var(--text-main)";
+        }
+
+        document.getElementById('c3_consumo_total').innerText = consumoTotal;
+        document.getElementById('c3_tarifa_distribuidora').innerText = fmtNum(tarifaCheia);
+
+        const totalConsumoC3 = consumoTotal * tarifaCheia;
+        const somaBandeirasC3 = bandeiraAmarela + bandeiraVermelha; // Correção solicitada: soma das duas bandeiras
+        const iluminacaoC3 = parseValor('c3_iluminacao');
+        const jurosC3 = parseValor('c3_juros');
+        const parcelamentoC3 = parseValor('c3_parcelamento');
+
+        document.getElementById('c3_total_consumo').innerText = fmtBRL(totalConsumoC3);
+        document.getElementById('c3_bandeira_amarela').innerText = fmtBRL(somaBandeirasC3);
+
+        const totalDistribuidora = totalConsumoC3 + somaBandeirasC3 + iluminacaoC3 + jurosC3 + parcelamentoC3;
+        document.getElementById('c3_total_distribuidora').innerText = fmtBRL(totalDistribuidora);
+
+        const valorDistribuidoraInput = parseValor('c3_distribuidora_input');
+        const faturaOrigo = boletoOrigoSistema;
+        
+        const totalGeral = valorDistribuidoraInput + faturaOrigo;
+        document.getElementById('c3_fatura_origo').innerText = fmtBRL(faturaOrigo);
+        document.getElementById('res_total_geral').innerText = fmtBRL(totalGeral);
+
+        const economiaMes = totalDistribuidora - totalGeral;
+        document.getElementById('res_economia_mes').innerText = fmtBRL(economiaMes);
+
+        if (revelarColunas) {
+            document.getElementById('coluna2').classList.remove('hidden-col');
+            document.getElementById('coluna3').classList.remove('hidden-col');
+            document.getElementById('simuladorContainer').classList.remove('colunas-1');
+            document.getElementById('simuladorContainer').classList.add('colunas-3');
+        }
+    }
+
+    function executarCalculoPrincipal() {
+        calcularTudo(true);
+    }
+
+    document.getElementById('btnCalcular').addEventListener('click', executarCalculoPrincipal);
+
+    // Acionamento da Impressão Nativa do Navegador
+    document.getElementById('btnImprimir').addEventListener('click', () => {
+        window.print();
+    });
+});
+</script>
+
+</body>
+</html>
